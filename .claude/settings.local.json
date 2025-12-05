@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go mod download:*)",
+      "Bash(make build:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(tree:*)",
+      "Bash(./selfcontrol:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
