@@ -8,7 +8,7 @@ SelfControl TUI helps you stay focused by blocking websites for a specified dura
 
 **Key Features:**
 - 🚫 Block websites using `/etc/hosts` modification
-- ⏱️ Predefined durations: 5min, 15min, 1h, 4h, 6h, 8h
+- ⏱️ Predefined durations: 30sec (testing), 5min, 15min, 1h, 4h, 6h, 8h
 - 🔄 Persistent sessions across app restarts
 - 🎯 Simple keyboard-driven interface
 - 🌐 Wildcard pattern support (`*.linkedin.*`)
@@ -23,14 +23,26 @@ SelfControl TUI helps you stay focused by blocking websites for a specified dura
 # Clone or navigate to the project directory
 cd selfcontrol
 
-# Build both binaries
-make build
+# Build, install, and start daemon (one command does it all)
+make update
 
-# Install system-wide (optional)
-make install
+# Or do it step-by-step:
+make build              # Build both binaries
+make install            # Install to /usr/local/bin
+make install-daemon     # Install and start daemon
+```
 
-# Install background daemon (recommended)
-make install-daemon
+### Updating to Latest Version
+
+After pulling the latest code changes:
+
+```bash
+# This command will:
+# - Build the latest binaries
+# - Stop the running daemon
+# - Install updated binaries
+# - Restart the daemon
+make update
 ```
 
 ### First Use
@@ -73,6 +85,7 @@ sudo selfcontrol
 **Start a Session:**
 - Press `s` to start blocking
 - Choose from predefined durations:
+  - 30 seconds - Quick test (for debugging)
   - 5 minutes - Quick focus session
   - 15 minutes - Short break blocker
   - 1 hour - Standard work session
@@ -101,7 +114,12 @@ Wildcard patterns automatically expand to block multiple variations:
 
 ### 4. Persistence
 
-**State stored in:** `$HOME/.config/selfcontrol-tui/state.json`
+**State stored in:** `/tmp/selfcontrol-tui-state.json`
+
+**Why /tmp?**
+- Accessible by both TUI (run with sudo) and daemon
+- Works consistently across all users and system services
+- Cleared on reboot (which would expire timers anyway)
 
 **What persists:**
 - All blocked URLs
@@ -109,7 +127,7 @@ Wildcard patterns automatically expand to block multiple variations:
 - Timer continues accurately across:
   - App restarts
   - System sleep/wake
-  - Reboots (if daemon is installed)
+  - Note: Cleared on reboot (timers would expire anyway)
 
 ## How It Works
 
@@ -185,6 +203,9 @@ sudo launchctl list | grep selfcontrol
 ### Build Commands
 
 ```bash
+# Update everything (build, install, restart daemon)
+make update
+
 # Build both binaries
 make build
 
@@ -277,7 +298,7 @@ The UI uses carefully chosen colors for visual hierarchy:
 
 ### State Management
 
-**File:** `~/.config/selfcontrol-tui/state.json`
+**File:** `/tmp/selfcontrol-tui-state.json`
 
 **Example:**
 ```json
@@ -295,7 +316,10 @@ The UI uses carefully chosen colors for visual hierarchy:
 }
 ```
 
-**Key design:** Stores absolute `end_time` (not relative duration) so timer remains accurate across system sleep, clock changes, and restarts.
+**Key design:**
+- Stores absolute `end_time` (not relative duration) for accurate timers across system sleep/clock changes
+- Located in `/tmp` for universal access by both TUI and daemon
+- Cleared on system reboot (which would expire active sessions anyway)
 
 ### Platform Compatibility
 
@@ -370,7 +394,7 @@ sudo nano /etc/hosts
 
 **Option 2: Reset state**
 ```bash
-rm ~/.config/selfcontrol-tui/state.json
+rm /tmp/selfcontrol-tui-state.json
 sudo nano /etc/hosts  # Clean up manually
 ```
 
@@ -511,7 +535,7 @@ sudo rm /Library/LaunchDaemons/com.selfcontrol.daemon.plist
 
 ### Remove state
 ```bash
-rm -rf ~/.config/selfcontrol-tui
+rm /tmp/selfcontrol-tui-state.json
 ```
 
 ### Clean /etc/hosts

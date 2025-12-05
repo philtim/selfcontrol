@@ -5,7 +5,10 @@
       "Bash(make build:*)",
       "Bash(go mod tidy:*)",
       "Bash(tree:*)",
-      "Bash(./selfcontrol:*)"
+      "Bash(./selfcontrol:*)",
+      "Bash(chmod:*)",
+      "Bash(sudo cp:*)",
+      "Bash(sudo chmod:*)"
     ],
     "deny": [],
     "ask": []

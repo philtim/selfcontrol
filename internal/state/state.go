@@ -23,11 +23,22 @@ type Session struct {
 var statePath string
 
 func init() {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		panic("cannot determine home directory: " + err.Error())
-	}
-	statePath = filepath.Join(home, ".config", "selfcontrol-tui", "state.json")
+	statePath = determineStatePath()
+}
+
+// determineStatePath finds the appropriate state file path
+// Works on both macOS and Linux, handles daemon cases where HOME is not set
+// Uses /tmp as a universal location accessible by all users and processes
+func determineStatePath() string {
+	// Always use /tmp for consistency between TUI (run with sudo) and daemon
+	// This ensures both processes access the same state file
+	// /tmp is accessible by all users and cleared on reboot (which would expire timers anyway)
+	return "/tmp/selfcontrol-tui-state.json"
+}
+
+// GetStatePath returns the current state file path (useful for debugging)
+func GetStatePath() string {
+	return statePath
 }
 
 // Load reads the state from disk

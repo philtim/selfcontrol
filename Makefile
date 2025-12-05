@@ -1,4 +1,4 @@
-.PHONY: build install clean test run daemon install-daemon uninstall-daemon
+.PHONY: build install clean test run daemon install-daemon uninstall-daemon update stop-daemon
 
 # Build both binaries to dist/ folder
 build:
@@ -10,8 +10,17 @@ build:
 	@echo "✓ Build complete"
 	@echo "Binaries available in: dist/"
 
-# Install binaries to /usr/local/bin
-install: build
+# Stop daemon if running (cross-platform)
+stop-daemon:
+	@echo "Stopping daemon if running..."
+	@if [ "$(shell uname)" = "Linux" ]; then \
+		sudo systemctl stop selfcontrol-daemon 2>/dev/null || true; \
+	elif [ "$(shell uname)" = "Darwin" ]; then \
+		sudo launchctl unload /Library/LaunchDaemons/com.selfcontrol.daemon.plist 2>/dev/null || true; \
+	fi
+
+# Install binaries to /usr/local/bin (stops daemon first if running)
+install: build stop-daemon
 	@echo "Installing binaries..."
 	sudo cp dist/selfcontrol /usr/local/bin/
 	sudo cp dist/selfcontrol-daemon /usr/local/bin/
@@ -19,11 +28,25 @@ install: build
 	sudo chmod +x /usr/local/bin/selfcontrol-daemon
 	@echo "✓ Binaries installed to /usr/local/bin"
 
-# Install daemon service
+# Install daemon service (restarts if already installed)
 install-daemon: install
 	@echo "Installing daemon service..."
 	sudo ./scripts/install-daemon.sh
-	@echo "✓ Daemon installed"
+	@echo "✓ Daemon installed and started"
+
+# Update everything (build, install, restart daemon)
+update: install-daemon
+	@echo ""
+	@echo "✓ Update complete!"
+	@echo ""
+	@echo "To verify daemon is running:"
+	@if [ "$(shell uname)" = "Linux" ]; then \
+		echo "  sudo systemctl status selfcontrol-daemon"; \
+		echo "  sudo journalctl -u selfcontrol-daemon -f"; \
+	elif [ "$(shell uname)" = "Darwin" ]; then \
+		echo "  sudo launchctl list | grep selfcontrol"; \
+		echo "  tail -f /var/log/selfcontrol-daemon.log"; \
+	fi
 
 # Uninstall daemon service
 uninstall-daemon:
@@ -74,14 +97,20 @@ lint:
 help:
 	@echo "SelfControl TUI - Makefile commands"
 	@echo ""
-	@echo "  make build           - Build both binaries"
+	@echo "Installation & Updates:"
+	@echo "  make update          - Build, install, and restart daemon (recommended)"
 	@echo "  make install         - Install binaries to /usr/local/bin"
 	@echo "  make install-daemon  - Install and start background daemon"
 	@echo "  make uninstall-daemon- Stop and remove background daemon"
+	@echo ""
+	@echo "Development:"
+	@echo "  make build           - Build both binaries to dist/"
 	@echo "  make run             - Build and run TUI (with sudo)"
 	@echo "  make daemon          - Build and run daemon in foreground"
 	@echo "  make clean           - Remove build artifacts"
 	@echo "  make test            - Run tests"
+	@echo ""
+	@echo "Code Quality:"
 	@echo "  make deps            - Download and tidy dependencies"
 	@echo "  make fmt             - Format code"
 	@echo "  make lint            - Run linter"

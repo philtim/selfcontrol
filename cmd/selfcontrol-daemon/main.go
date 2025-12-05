@@ -18,7 +18,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("SelfControl Daemon started - monitoring for expired sessions...")
+	fmt.Printf("SelfControl Daemon started\n")
+	fmt.Printf("State file: %s\n", state.GetStatePath())
+	fmt.Println("Monitoring for expired sessions every 10 seconds...")
 
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()

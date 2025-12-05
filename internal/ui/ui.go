@@ -716,6 +716,7 @@ func (m Model) renderDurationView() string {
 	// Durations
 	durations := timer.PredefinedDurations()
 	descriptions := map[string]string{
+		"30 seconds": "Quick test (for debugging)",
 		"5 minutes":  "Quick focus session",
 		"15 minutes": "Short break blocker",
 		"1 hour":     "Standard work session",

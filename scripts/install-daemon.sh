@@ -2,6 +2,7 @@
 
 # Installation script for SelfControl daemon
 # Run with: sudo ./scripts/install-daemon.sh
+# Handles both fresh installs and updates
 
 set -e
 
@@ -23,6 +24,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         echo "Please run 'make install' first"
         exit 1
     fi
+
+    # Stop service if already running
+    systemctl stop selfcontrol-daemon 2>/dev/null || true
 
     # Copy service file
     cp scripts/selfcontrol-daemon.service /etc/systemd/system/
@@ -47,11 +51,17 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         exit 1
     fi
 
+    # Unload service if already running
+    launchctl unload /Library/LaunchDaemons/com.selfcontrol.daemon.plist 2>/dev/null || true
+
     # Copy plist file
     cp scripts/com.selfcontrol.daemon.plist /Library/LaunchDaemons/
 
-    # Load service
+    # Load and start service
     launchctl load /Library/LaunchDaemons/com.selfcontrol.daemon.plist
+
+    # Give it a moment to start
+    sleep 1
 
     echo "✓ Service installed and started"
     echo "Check status with: sudo launchctl list | grep selfcontrol"

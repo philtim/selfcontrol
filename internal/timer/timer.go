@@ -14,6 +14,7 @@ type Duration struct {
 // PredefinedDurations returns the list of available durations
 func PredefinedDurations() []Duration {
 	return []Duration{
+		{Label: "30 seconds", Duration: 30 * time.Second},
 		{Label: "5 minutes", Duration: 5 * time.Minute},
 		{Label: "15 minutes", Duration: 15 * time.Minute},
 		{Label: "1 hour", Duration: 1 * time.Hour},
