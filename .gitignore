@@ -1,6 +1,6 @@
 # Binaries
-selfcontrol
-selfcontrol-daemon
+./selfcontrol
+./selfcontrol-daemon
 
 # Go build artifacts
 *.exe
