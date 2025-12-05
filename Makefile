@@ -1,18 +1,20 @@
 .PHONY: build install clean test run daemon install-daemon uninstall-daemon
 
-# Build both binaries
+# Build both binaries to dist/ folder
 build:
 	@echo "Building selfcontrol..."
-	go build -o selfcontrol ./cmd/selfcontrol
+	@mkdir -p dist
+	go build -o dist/selfcontrol ./cmd/selfcontrol
 	@echo "Building selfcontrol-daemon..."
-	go build -o selfcontrol-daemon ./cmd/selfcontrol-daemon
+	go build -o dist/selfcontrol-daemon ./cmd/selfcontrol-daemon
 	@echo "✓ Build complete"
+	@echo "Binaries available in: dist/"
 
 # Install binaries to /usr/local/bin
 install: build
 	@echo "Installing binaries..."
-	sudo cp selfcontrol /usr/local/bin/
-	sudo cp selfcontrol-daemon /usr/local/bin/
+	sudo cp dist/selfcontrol /usr/local/bin/
+	sudo cp dist/selfcontrol-daemon /usr/local/bin/
 	sudo chmod +x /usr/local/bin/selfcontrol
 	sudo chmod +x /usr/local/bin/selfcontrol-daemon
 	@echo "✓ Binaries installed to /usr/local/bin"
@@ -39,16 +41,16 @@ uninstall-daemon:
 
 # Run the TUI (with sudo)
 run: build
-	sudo ./selfcontrol
+	sudo ./dist/selfcontrol
 
 # Run the daemon in foreground (for testing)
 daemon: build
-	sudo ./selfcontrol-daemon
+	sudo ./dist/selfcontrol-daemon
 
 # Clean build artifacts
 clean:
 	@echo "Cleaning..."
-	rm -f selfcontrol selfcontrol-daemon
+	rm -rf dist
 	@echo "✓ Clean complete"
 
 # Run tests

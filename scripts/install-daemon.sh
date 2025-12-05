@@ -16,9 +16,13 @@ echo "Installing SelfControl daemon..."
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo "Detected Linux - installing systemd service"
 
-    # Copy binary
-    cp selfcontrol-daemon /usr/local/bin/
-    chmod +x /usr/local/bin/selfcontrol-daemon
+    # Binary should already be installed by 'make install'
+    # Just verify it exists
+    if [ ! -f /usr/local/bin/selfcontrol-daemon ]; then
+        echo "Error: selfcontrol-daemon not found in /usr/local/bin"
+        echo "Please run 'make install' first"
+        exit 1
+    fi
 
     # Copy service file
     cp scripts/selfcontrol-daemon.service /etc/systemd/system/
@@ -35,9 +39,13 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Detected macOS - installing launchd service"
 
-    # Copy binary
-    cp selfcontrol-daemon /usr/local/bin/
-    chmod +x /usr/local/bin/selfcontrol-daemon
+    # Binary should already be installed by 'make install'
+    # Just verify it exists
+    if [ ! -f /usr/local/bin/selfcontrol-daemon ]; then
+        echo "Error: selfcontrol-daemon not found in /usr/local/bin"
+        echo "Please run 'make install' first"
+        exit 1
+    fi
 
     # Copy plist file
     cp scripts/com.selfcontrol.daemon.plist /Library/LaunchDaemons/
