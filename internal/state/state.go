@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 )
 
@@ -67,6 +68,9 @@ func Load() (*AppState, error) {
 		return nil, err
 	}
 
+	// Sort URLs alphabetically
+	state.sortURLs()
+
 	return &state, nil
 }
 
@@ -89,6 +93,14 @@ func (s *AppState) AddURL(url string) {
 		}
 	}
 	s.URLs = append(s.URLs, url)
+	s.sortURLs()
+}
+
+// sortURLs sorts the URLs alphabetically (case-insensitive)
+func (s *AppState) sortURLs() {
+	sort.Slice(s.URLs, func(i, j int) bool {
+		return s.URLs[i] < s.URLs[j]
+	})
 }
 
 // RemoveURLs removes URLs at the specified indices
