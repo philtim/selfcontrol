@@ -29,12 +29,12 @@ func init() {
 
 // determineStatePath finds the appropriate state file path
 // Works on both macOS and Linux, handles daemon cases where HOME is not set
-// Uses /tmp as a universal location accessible by all users and processes
+// Uses /var/lib/selfcontrol as a persistent location accessible by both TUI and daemon
 func determineStatePath() string {
-	// Always use /tmp for consistency between TUI (run with sudo) and daemon
-	// This ensures both processes access the same state file
-	// /tmp is accessible by all users and cleared on reboot (which would expire timers anyway)
-	return "/tmp/selfcontrol-tui-state.json"
+	// Use /var/lib/selfcontrol for persistent storage across reboots
+	// This ensures both TUI (run with sudo) and daemon access the same state file
+	// URLs and active sessions persist across reboots
+	return "/var/lib/selfcontrol/state.json"
 }
 
 // GetStatePath returns the current state file path (useful for debugging)
